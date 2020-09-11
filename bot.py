@@ -94,7 +94,7 @@ async def handler(event):
 
             # check if the text in query is empty and answer
             # with a stub sticker and warning text, if not - generate sticker with this text
-        
+
             if text_to_render == '':
                 await event.answer(results=[
                     builder.document(utils.resolve_bot_file_id('CAADAgADUAADq1fEC2ZINSTHw8cmAg'), type='sticker')
@@ -112,7 +112,7 @@ async def handler(event):
                     ], switch_pm='Visit @honka_home for updates', switch_pm_param='HONK', cache_time=86400, gallery=True)
                 else:
                     # generate and send stickers for a query, in different sizes,
-                    # setting cache time to 86400 seconds (a day) 
+                    # setting cache time to 86400 seconds (a day)
                     # helps to skip generating similar queries
                     journal.send('Generating '+direction+' stickers for '+text_to_render+', hash '+sticker_name)
                     generateHonka(sticker_name, str(text_to_render), direction=direction)
