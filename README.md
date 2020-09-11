@@ -18,3 +18,6 @@ You will also need to register your custom Telegram Client to use it's credentia
 
 # Launch
 Simply run `bot.py`
+
+# Thanks
+Big thanks to @winsw1n and @BloodyKnight for logic, and @MattBas for his incredible lottie library ❤
