@@ -7,7 +7,7 @@ Its available at https://t.me/honka_says_bot and works in any chat via inline re
 As the Bot API doesn't let you send animated stickers via inline response (yet), we have to use something more powerful, like Telethon. It has the tools we need to create what we need.
 
 # Requirements
-This bot uses:
+This bot uses:  
 `Telethon==1.16.2`  
 `lottie==0.6.5`  
 `systemd==0.16.1`
