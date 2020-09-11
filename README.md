@@ -8,8 +8,8 @@ As the Bot API doesn't let you send animated stickers via inline response (yet),
 
 # Requirements
 This bot uses:
-`Telethon==1.16.2`
-`lottie==0.6.5`
+`Telethon==1.16.2`  
+`lottie==0.6.5`  
 `systemd==0.16.1`
 
 There is a requirements file to help you with that. 
