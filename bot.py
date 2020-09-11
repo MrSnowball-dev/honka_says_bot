@@ -1,14 +1,16 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 import logging
-logging.basicConfig(format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s',
-                    level=logging.WARNING)
 
-import os, json, gzip, hashlib
+import os
+import json
+import gzip
+import hashlib
+
 from systemd import journal
 
 # import API keys
-from settings import *
+from settings import api_id, api_hash, bot_token
 
 from telethon import TelegramClient
 from telethon.errors import FloodWaitError
@@ -17,6 +19,9 @@ from telethon import events, utils
 from lottie.utils.font import FontStyle
 from lottie.objects.text import TextJustify
 from lottie import objects, Color
+
+logging.basicConfig(format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s',
+                    level=logging.WARNING)
 
 # load templates once script starts
 with open('template.json', encoding='utf-8') as temp_json:
@@ -29,7 +34,12 @@ with open('reverse_template.json', encoding='utf-8') as temp_json:
 # text - what text to render on a sticker
 # size, margin, top_margin - variables to properly position generated text, these are fixed, but might be customizable later
 # direction - which way the sticker will face, defines what sticker template to use for generation
-def generateHonka(file_name: str, text: str, size: int = 35, margin: int = 0, top_margin: int = -5, direction: str = 'normal'):
+def generateHonka(file_name: str,
+                  text: str,
+                  size: int = 35,
+                  margin: int = 0,
+                  top_margin: int = -5,
+                  direction: str = 'normal'):
     # define font and template to work with
     font = FontStyle("Comic Sans MS:style=bold", size, justify=TextJustify.Center, emoji_svg='twemoji-svg/')
     t_sticker = template_sticker.copy()
