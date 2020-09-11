@@ -39,7 +39,7 @@ def generateHonka(file_name: str, text: str, size: int = 35, margin: int = 0, to
 
     # render text
     text_shape = font.render(text)
-    
+
     # create a layer with the same parameters as the template
     layer = objects.ShapeLayer.load(t_layer)
     layer.name = f"{text} outlines"
@@ -50,7 +50,7 @@ def generateHonka(file_name: str, text: str, size: int = 35, margin: int = 0, to
     added_text.transform.position.value.x = margin
     added_text.transform.position.value.y = top_margin
     layer.add_shape(objects.Fill(Color(0, 0, 0)))
-    
+
     # replace existing layer with the new one
     layer_dict = layer.to_dict()
     t_sticker["layers"][2] = layer_dict
@@ -58,7 +58,7 @@ def generateHonka(file_name: str, text: str, size: int = 35, margin: int = 0, to
     # save to .tgs
     with gzip.open(os.path.join('renders', file_name+'.tgs'), "wb") as final_tgs:
         final_tgs.write(json.dumps(t_sticker).encode("utf-8"))
-    
+
     return True;
 
 # init Telethon bot client and start it
@@ -70,7 +70,7 @@ journal.send('Bot started!')
 async def handler(event):
     # define default variables
     builder = event.builder
-    
+
     direction = 'normal'
     text_to_render = event.text
     # check if user has the dot at the end of a query to reduce load and not generate excessive
