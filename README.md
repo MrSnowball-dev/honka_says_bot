@@ -1,6 +1,6 @@
 # @honka_says_bot - an animated sticker generator bot for Telegram
-A Python script to run Honka Says Bot.
-This simple script will generate text, place it onto a sticker and send them to you via inline.
+A Python script to run Honka Says Bot.  
+This simple script will generate text, place it onto a sticker and send it to you using inline feature.
 
 Its available at https://t.me/honka_says_bot and works in any chat via inline request.
 
