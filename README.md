@@ -13,7 +13,7 @@ This bot uses:
 `systemd==0.16.1`
 
 There is a requirements file to help you with that.  
-`lottie` also uses `fonttools` module , so you might install just this or `lottie[ALL]`
+`lottie` also uses `fonttools` module , so you might install just this or `lottie[ALL]`  
 `systemd` package is just for convenient logging when you launch the script as a service.  
 You will also need to register your custom Telegram Client to use it's credentials with Telethon, please refer to it's documentation.
 
