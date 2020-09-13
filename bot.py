@@ -83,56 +83,61 @@ async def handler(event):
 
     direction = 'normal'
     text_to_render = event.text
+
+    # preliminary checks before we render something
     # check if user has the dot at the end of a query to reduce load and not generate excessive
     # amounts of unused files
     if not text_to_render.endswith('.'):
         await event.answer(results=[
             builder.document(utils.resolve_bot_file_id('CAADAgADUAADq1fEC2ZINSTHw8cmAg'), type='sticker')
         ], switch_pm='End your query with a dot', switch_pm_param='DOT', cache_time=0, gallery=True)
+    # check if query is not too long, otherwise TG sticker will not validate
+    elif len(text_to_render) > 50:
+        await event.answer(results=[
+            builder.document(utils.resolve_bot_file_id('CAADAgADUAADq1fEC2ZINSTHw8cmAg'), type='sticker')
+        ], switch_pm='Your query is too long!', switch_pm_param='LENGTH', cache_time=0, gallery=True)
+    # check if query is empty to send generic answer
+    elif text_to_render == '':
+                await event.answer(results=[
+                    builder.document(utils.resolve_bot_file_id('CAADAgADUAADq1fEC2ZINSTHw8cmAg'), type='sticker')
+                ], switch_pm='Visit @honka_home for updates', switch_pm_param='HONK', cache_time=86400, gallery=True)
     else:
+        # clearing the dot
         text_to_render = text_to_render[:-1]
 
-        # check if user wants reversed sticker
+        # check if user wants reversed sticker, if so - clearing the minus
         if text_to_render.startswith('-'):
             text_to_render = text_to_render[1:]
             direction = 'reverse'
 
         try:
-            # we generate sticker name based on a text someone sent,
+            # here we generate sticker name based on a text someone sent,
             # hashing it for security and convenience
             sticker_name = hashlib.md5(str(text_to_render).encode('utf-8')).hexdigest()
 
-            # check if the text in query is empty and answer
-            # with a stub sticker and warning text, if not - generate sticker with this text
-
-            if text_to_render == '':
+            # we don't want to generate the same sticker over again,
+            # so if someone happen to use the same query and TG has no cache for it for some reasonЯ
+            # we just answer with existing stickers
+            if os.path.exists(os.path.join('renders', sticker_name+'.tgs')):
+                journal.send('Send existing '+direction+' stickers for '+text_to_render+', hash '+sticker_name)
                 await event.answer(results=[
-                    builder.document(utils.resolve_bot_file_id('CAADAgADUAADq1fEC2ZINSTHw8cmAg'), type='sticker')
+                    builder.document(os.path.join('renders', sticker_name+'-small.tgs'), type='sticker'),
+                    builder.document(os.path.join('renders', sticker_name+'.tgs'), type='sticker'),
+                    builder.document(os.path.join('renders', sticker_name+'-large.tgs'), type='sticker')
                 ], switch_pm='Visit @honka_home for updates', switch_pm_param='HONK', cache_time=86400, gallery=True)
             else:
-                # we don't want to generate the same sticker over again,
-                # so if someone happen to use the same query and TG has no cache for it
-                # we just answer with existing stickers
-                if os.path.exists(os.path.join('renders', sticker_name+'.tgs')):
-                    journal.send('Send existing '+direction+' stickers for '+text_to_render+', hash '+sticker_name)
-                    await event.answer(results=[
-                        builder.document(os.path.join('renders', sticker_name+'-small.tgs'), type='sticker'),
-                        builder.document(os.path.join('renders', sticker_name+'.tgs'), type='sticker'),
-                        builder.document(os.path.join('renders', sticker_name+'-large.tgs'), type='sticker')
-                    ], switch_pm='Visit @honka_home for updates', switch_pm_param='HONK', cache_time=86400, gallery=True)
-                else:
-                    # generate and send stickers for a query, in different sizes,
-                    # setting cache time to 86400 seconds (a day)
-                    # helps to skip generating similar queries
-                    journal.send('Generating '+direction+' stickers for '+text_to_render+', hash '+sticker_name)
-                    generateHonka(sticker_name, str(text_to_render), direction=direction)
-                    generateHonka(sticker_name+'-small', str(text_to_render), 25, top_margin=-10, direction=direction)
-                    generateHonka(sticker_name+'-large', str(text_to_render), 48, top_margin=1, direction=direction)
-                    await event.answer(results=[
-                        builder.document(os.path.join('renders', sticker_name+'-small.tgs'), type='sticker'),
-                        builder.document(os.path.join('renders', sticker_name+'.tgs'), type='sticker'),
-                        builder.document(os.path.join('renders', sticker_name+'-large.tgs'), type='sticker')
-                    ], switch_pm='Visit @honka_home for updates', switch_pm_param='HONK', cache_time=86400, gallery=True)
+                # generate and send stickers for a query, in different sizes,
+                # setting cache time to 86400 seconds (a day)
+                # helps to skip generating similar queries
+                journal.send('Generating '+direction+' stickers for '+text_to_render+', hash '+sticker_name)
+                generateHonka(sticker_name, str(text_to_render), direction=direction)
+                generateHonka(sticker_name+'-small', str(text_to_render), 25, top_margin=-10, direction=direction)
+                generateHonka(sticker_name+'-large', str(text_to_render), 48, top_margin=1, direction=direction)
+                await event.answer(results=[
+                    builder.document(os.path.join('renders', sticker_name+'-small.tgs'), type='sticker'),
+                    builder.document(os.path.join('renders', sticker_name+'.tgs'), type='sticker'),
+                    builder.document(os.path.join('renders', sticker_name+'-large.tgs'), type='sticker')
+                ], switch_pm='Visit @honka_home for updates', switch_pm_param='HONK', cache_time=86400, gallery=True)
         except FloodWaitError as identifier:
             # show an explanation on why no stickers being sent to a user in case of a flood detection
             journal.send('Got flooded, waiting for '+identifier.seconds+' seconds')
@@ -148,7 +153,9 @@ async def messageHandler(event):
         await bot.send_message(event.sender_id, 'Go to @honka_home for updates!')
     elif event.text == '/start DOT':
         await bot.send_message(event.sender_id, 'You must end your query with a dot\n\nВаш запрос должен оканчиваться точкой')
+    elif event.text == '/start LENGTH':
+        await bot.send_message(event.sender_id, 'Your query must not exceed 50 characters\n\nВаш запрос должен оканчиваться точкой')
     else:
-        await bot.send_message(event.sender_id, 'Use this bot inline in any chat!\nJust type your text with a dot at the end:\n@honka_says_bot `text.`\n\nБот работает в любом чате!\nПросто наберите (не забудьте точку в конце):\n@honka_says_bot `ваш_текст.`', parse_mode='md')
+        await bot.send_message(event.sender_id, 'Use this bot inline in any chat!\nJust type your text with a dot at the end:\n@honka_says_bot `text.`\nMaximum length is 50 characters\n\nБот работает в любом чате!\nПросто наберите (не забудьте точку в конце):\n@honka_says_bot `ваш_текст.`\nМаксимальная длина строки - 50 символов', parse_mode='md')
 
 bot.run_until_disconnected()
